@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -15,7 +17,7 @@ export class TodoAwsStack extends Stack {
     this.client = new StaticWebsiteNestedStack(this, 'TodoAppClient');
 
     this.api = new apigateway.RestApi(this, 'TodoRestApi', { });
-    this.api.root.addResource('/todos', {
+    this.api.root.addResource('todos', {
       defaultCorsPreflightOptions: {
         allowOrigins: [ 'https://*.prettycool.link' ],
         allowMethods: [ 'GET' ]
@@ -24,10 +26,10 @@ export class TodoAwsStack extends Stack {
 
     const getTodosHandler = new lambda.Function(this, 'GetTodos', {
       runtime: lambda.Runtime.NODEJS_14_X, 
-      code: lambda.Code.fromAsset('lambda'),
+      code: lambda.Code.fromAsset(path.join(__dirname, 'lambda')),
       handler: 'todos.get'
     });
-    
-    this.api.root.getResource('/todos')?.addMethod('GET', new apigateway.LambdaIntegration(getTodosHandler));
+
+    this.api.root.getResource('todos')?.addMethod('GET', new apigateway.LambdaIntegration(getTodosHandler));
   }
 }

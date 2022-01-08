@@ -27,7 +27,7 @@ export class StaticWebsiteNestedStack extends cdk.NestedStack {
         errorCode: 404,
         errorCachingMinTtl: 900,
         responseCode: 200,
-        responsePagePath: '/index.html' 
+        responsePagePath: 'index.html' 
       }]
     });
   }
