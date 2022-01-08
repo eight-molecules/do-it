@@ -2,6 +2,7 @@ import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 
 import { StaticWebsiteNestedStack } from './stacks/StaticWebsiteStack';
 
@@ -20,5 +21,13 @@ export class TodoAwsStack extends Stack {
         allowMethods: [ 'GET' ]
       }
     })
+
+    const getTodosHandler = new lambda.Function(this, 'GetTodos', {
+      runtime: lambda.Runtime.NODEJS_14_X, 
+      code: lambda.Code.fromAsset('lambda'),
+      handler: 'todos.get'
+    });
+    
+    this.api.root.getResource('/todos')?.addMethod('GET', new apigateway.LambdaIntegration(getTodosHandler));
   }
 }
