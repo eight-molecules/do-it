@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { Stack, StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
@@ -16,6 +16,7 @@ export class TodoAwsStack extends Stack {
 
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
+    
     this.client = new StaticWebsiteNestedStack(this, 'TodoAppClient');
 
     this.api = new apigateway.RestApi(this, 'TodoRestApi', { });
@@ -29,11 +30,17 @@ export class TodoAwsStack extends Stack {
     const getTodosHandler = new lambda.Function(this, 'GetTodos', {
       runtime: lambda.Runtime.NODEJS_14_X, 
       code: lambda.Code.fromAsset(path.join(__dirname, 'lambda')),
-      handler: 'todos.get'
+      handler: 'todos.get',
     });
 
-    this.api.root.getResource('todos')?.addMethod('GET', new apigateway.LambdaIntegration(getTodosHandler));
+    this.api.root.getResource('todos')?.addMethod('GET', new apigateway.LambdaIntegration(getTodosHandler), {
+      authorizationType: apigateway.AuthorizationType.NONE
+    });
 
     this.api.applyRemovalPolicy(removalPolicy);
+
+    new CfnOutput(this, 'TodoApiDomainName', {
+      value: `${this.api.domainName?.domainName}`
+    });
   }
 }

@@ -15,6 +15,7 @@ export class StaticWebsiteNestedStack extends cdk.NestedStack {
     this.bucket = new s3.Bucket(this, `${id}Bucket`, {
       websiteIndexDocument: 'index.html',
       websiteErrorDocument: 'index.html',
+      publicReadAccess: true,
     });
 
     this.distribution = new cloudfront.CloudFrontWebDistribution(this, `${id}Distribution`, {
@@ -30,7 +31,7 @@ export class StaticWebsiteNestedStack extends cdk.NestedStack {
         errorCode: 404,
         errorCachingMinTtl: 900,
         responseCode: 200,
-        responsePagePath: 'index.html' 
+        responsePagePath: '/index.html' 
       }]
     });
 
