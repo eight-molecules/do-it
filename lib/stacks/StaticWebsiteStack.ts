@@ -3,12 +3,15 @@ import { Construct } from "constructs";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 
+import { removalPolicy as defaultRemovalPolicy, removalPolicy } from '../../env';
+
 export class StaticWebsiteNestedStack extends cdk.NestedStack {
   bucket: s3.Bucket;
   distribution: cloudfront.CloudFrontWebDistribution;
 
   constructor(scope: Construct, id: string, props?: cdk.NestedStackProps) {
     super(scope, `${id}NestedStack`)
+
     this.bucket = new s3.Bucket(this, `${id}Bucket`, {
       websiteIndexDocument: 'index.html',
       websiteErrorDocument: 'index.html',
@@ -30,5 +33,12 @@ export class StaticWebsiteNestedStack extends cdk.NestedStack {
         responsePagePath: 'index.html' 
       }]
     });
+
+    this.applyRemovalPolicies(props?.removalPolicy);
+  }
+
+  private applyRemovalPolicies(removalPolicy = defaultRemovalPolicy) {
+    this.bucket.applyRemovalPolicy(removalPolicy);
+    this.distribution.applyRemovalPolicy(removalPolicy);
   }
 };

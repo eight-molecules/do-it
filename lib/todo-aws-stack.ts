@@ -6,6 +6,8 @@ import { Construct } from 'constructs';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 
+import { removalPolicy } from '../env';
+
 import { StaticWebsiteNestedStack } from './stacks/StaticWebsiteStack';
 
 export class TodoAwsStack extends Stack {
@@ -31,5 +33,7 @@ export class TodoAwsStack extends Stack {
     });
 
     this.api.root.getResource('todos')?.addMethod('GET', new apigateway.LambdaIntegration(getTodosHandler));
+
+    this.api.applyRemovalPolicy(removalPolicy);
   }
 }
