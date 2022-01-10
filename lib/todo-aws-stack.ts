@@ -39,8 +39,8 @@ export class TodoAwsStack extends Stack {
 
     this.api.applyRemovalPolicy(removalPolicy);
 
-    new CfnOutput(this, 'TodoApiDomainName', {
-      value: `${this.api.domainName?.domainName}`
+    new CfnOutput(this, 'TodoAppDomainName', {
+      value: `${this.client.distribution.distributionDomainName}`
     });
   }
 }
