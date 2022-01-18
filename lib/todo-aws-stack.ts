@@ -30,7 +30,7 @@ export class TodoAwsStack extends Stack {
     const getTodosHandler = new lambda.Function(this, 'GetTodos', {
       runtime: lambda.Runtime.NODEJS_14_X, 
       code: lambda.Code.fromAsset(path.join(__dirname, 'lambda')),
-      handler: 'todos/get.handler',
+      handler: 'api/todos/get.handler',
     });
 
     this.api.root.getResource('todos')?.addMethod('GET', new apigateway.LambdaIntegration(getTodosHandler), {
