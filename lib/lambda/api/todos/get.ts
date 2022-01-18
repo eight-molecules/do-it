@@ -13,14 +13,16 @@ const extractFilters = ({ startDate, endDate, status }: any) => !startDate && !e
   })(status)
 } as TodoFilters);
 
-export const handler = async (event: any) => {
+const sideEffects = (event: any) => {
   console.log(event);
+};
 
+export const handler = async (event: any) => {
+  sideEffects(event);
+  
   try {
     const filters = extractFilters(event.queryParameters);
-
     const todos = await getTodos(filters);
-
     return response(200, todos);
   } catch (e) {
     console.error(e);
