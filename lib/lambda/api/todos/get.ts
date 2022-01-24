@@ -1,4 +1,4 @@
-import dayjs = require("dayjs");
+import dayjs from "dayjs";
 import { getTodos } from "../../services/todo.service";
 import { response } from "../../shared/response";
 
@@ -13,12 +13,12 @@ const extractFilters = ({ startDate, endDate, status }: any) => !startDate && !e
   })(status)
 } as TodoFilters);
 
-const sideEffects = (event: any) => {
-  console.log(event);
+const sideEffects = (event: any, dayjs: any) => {
+  console.log(event, dayjs);
 };
 
 export const handler = async (event: any) => {
-  sideEffects(event);
+  sideEffects(event, dayjs);
   
   try {
     const filters = extractFilters(event.queryParameters);

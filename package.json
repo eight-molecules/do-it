@@ -22,6 +22,7 @@
   "dependencies": {
     "aws-cdk-lib": "2.4.0",
     "constructs": "^10.0.0",
+    "create-react-app": "^5.0.0",
     "dayjs": "^1.10.7",
     "source-map-support": "^0.5.16"
   }

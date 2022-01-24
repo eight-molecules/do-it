@@ -4,7 +4,7 @@ import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as lambda from 'aws-cdk-lib/aws-lambda-nodejs';
 
 import { removalPolicy } from '../env';
 
@@ -27,10 +27,14 @@ export class TodoAwsStack extends Stack {
       }
     })
 
-    const getTodosHandler = new lambda.Function(this, 'GetTodos', {
-      runtime: lambda.Runtime.NODEJS_14_X, 
-      code: lambda.Code.fromAsset(path.join(__dirname, 'lambda')),
-      handler: 'api/todos/get.handler',
+    const getTodosHandler = new lambda.NodejsFunction(this, 'GetTodosFunction', {
+      entry: path.join(__dirname, '/lambda/api/todos/get.ts'),
+      handler: 'handler',
+      bundling: {
+        // minify: true,
+        sourceMap: true,
+        sourceMapMode: lambda.SourceMapMode.INLINE
+      }
     });
 
     this.api.root.getResource('todos')?.addMethod('GET', new apigateway.LambdaIntegration(getTodosHandler), {
