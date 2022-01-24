@@ -32,6 +32,7 @@ export class TodoAwsStack extends Stack {
       handler: 'handler',
       bundling: {
         // minify: true,
+        preCompilation: true,
         sourceMap: true,
         sourceMapMode: lambda.SourceMapMode.INLINE
       }
