@@ -31,8 +31,6 @@ export class TodoAwsStack extends Stack {
       entry: path.join(__dirname, '/lambda/api/todos/get.ts'),
       handler: 'handler',
       bundling: {
-        // minify: true,
-        preCompilation: true,
         sourceMap: true,
         sourceMapMode: lambda.SourceMapMode.INLINE
       }

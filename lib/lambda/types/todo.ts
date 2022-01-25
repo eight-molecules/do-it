@@ -1,7 +1,7 @@
-import * as dayjs from 'dayjs';
+import { Temporal } from '@js-temporal/polyfill';
 
 export interface TodoFilters { 
-  startDate: dayjs.Dayjs, 
-  endDate: dayjs.Dayjs, 
-  status: boolean 
+  startDate: Temporal.Instant, 
+  endDate: Temporal.Instant, 
+  done: boolean 
 };

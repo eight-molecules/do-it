@@ -1,28 +1,32 @@
-import { Dayjs } from "dayjs";
+import { Temporal } from "@js-temporal/polyfill";
 import { getTodos } from "../../services/todo.service";
 import { response } from "../../shared/response";
 
 import { TodoFilters } from "../../types/todo";
 
-const extractFilters = ({ startDate, endDate, status }: any) => !startDate && !endDate && !status ? undefined : ({ 
-  startDate: new Dayjs(startDate), 
-  endDate: new Dayjs((endDate)), 
-  status: ((status) => {
-    const transformedStatus = status?.toLowerCase();
-    return transformedStatus === 'true' || transformedStatus === 'false';
-  })(status)
-} as TodoFilters);
+const extractFilters = ({ startDate, endDate, status }: any) => {
+  if (!startDate && !endDate && !status) {
+    return undefined;
+  }
+  
+  return { 
+    startDate: Temporal.Instant.from(startDate), 
+    endDate: Temporal.Instant.from(endDate), 
+    done: ((status) => Boolean(status === 'true' || status === 'false'))(status.toLowerCase())
+  } as TodoFilters;
+}
 
-const sideEffects = (event: any) => {
+const sideEffects = async (event: any) => {
   console.log(event);
 };
 
-export const handler = async (event: any) => {
-  sideEffects(event);
-  
+export const handler = async (event: any) => {  
   try {
-    const filters = extractFilters(event.queryParameters);
+    sideEffects(event);
+
+    const filters = extractFilters({ ...event.queryStringParameters });
     const todos = await getTodos(filters);
+    
     return response(200, todos);
   } catch (e) {
     console.error(e);
