@@ -6,12 +6,13 @@ const defaultResponses: { [key: number]: () => { message: string } } = {
 };
 
 interface ResponseOptions {
-  minify: boolean
+  minify?: boolean
 };
 
 export const response = (statusCode: number, body?: any, options?: ResponseOptions) => {
   const useDefault = (typeof body === 'undefined' && typeof options === 'undefined');
-  let sanitizedBody = useDefault ? defaultResponses[statusCode]?.() ?? '' : body;
+  
+  const sanitizedBody = useDefault ? defaultResponses[statusCode]?.() ?? '' : body;
   const stringifiedBody = options?.minify ? JSON.stringify(sanitizedBody, null, 2) : JSON.stringify(body);
 
   return {
