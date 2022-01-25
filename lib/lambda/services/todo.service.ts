@@ -37,24 +37,20 @@ const todos: Todo[] = [
 
 
 export const getTodos = async (filters?: Partial<TodoFilters>): Promise<Todo[]> => new Promise((resolve) => setTimeout(() => {
-  if (!filters) {
-    resolve([ ...todos ]);
-  }
-
   const { startDate, endDate, done } = filters ?? { };
   const useStartDate = startDate instanceof Temporal.ZonedDateTime; 
   const useEndDate = endDate instanceof Temporal.ZonedDateTime;
   const useDone = typeof done === 'boolean';
 
   if (!useStartDate && !useEndDate && !useDone) {
-    resolve([]);
+    resolve([ ...todos ]);
   }
 
-  resolve(todos.filter((todo) => {
-    const matchStartDate = !useStartDate || Temporal.ZonedDateTime.compare(todo.date, startDate) > -1;
-    const matchEndDate = !useEndDate || Temporal.ZonedDateTime.compare(todo.date, endDate) <= 1;
-    const matchStatus = !useDone || todo.done === done;
+  const matchStartDate = (todo: Todo) => useStartDate === false || Temporal.ZonedDateTime.compare(todo.date, startDate!) > -1;
+  const matchEndDate = (todo: Todo) => useStartDate === false || Temporal.ZonedDateTime.compare(todo.date, endDate!) < 1;
+  const matchStatus = (todo: Todo) => useDone === false|| todo.done === done;
+  
+  const filteredResult = todos.filter((todo) => matchStartDate(todo) && matchEndDate(todo) && matchStatus(todo));
 
-    return matchStartDate && matchEndDate && matchStatus;
-  }));
+  resolve(filteredResult);
 }, 1000 * Math.random()));

@@ -11,9 +11,9 @@ interface ResponseOptions {
 
 export const response = (statusCode: number, body?: any, options?: ResponseOptions) => {
   const useDefault = (typeof body === 'undefined' && typeof options === 'undefined');
-  
+
   const sanitizedBody = useDefault ? defaultResponses[statusCode]?.() ?? '' : body;
-  const stringifiedBody = options?.minify ? JSON.stringify(sanitizedBody, null, 2) : JSON.stringify(body);
+  const stringifiedBody = options?.minify ? JSON.stringify(body) : JSON.stringify(sanitizedBody, null, 2);
 
   return {
     statusCode,

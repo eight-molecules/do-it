@@ -1,10 +1,18 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { getTodos } from "../../services/todo.service";
+import { handlerFactory } from "../../shared/handler";
 import { response } from "../../shared/response";
 
 import { TodoFilters } from "../../types/todo";
 
-const isZonedDateTime = (obj: any) => obj instanceof Temporal.ZonedDateTime;
+const parseDate = (obj: any) => {
+  try { 
+    return Temporal.ZonedDateTime.from(obj);
+  } catch (error) {
+    return undefined;
+  }
+};
+
 const parseBoolean = (str: string) => {
   if (typeof str !== 'string') {
     return undefined;
@@ -15,14 +23,10 @@ const parseBoolean = (str: string) => {
     return undefined;
   }
   
-  return Boolean(formattedString);
+  return formattedString === 'true';
 };
 
-const extractQueryParameters = ({ 
-  startDate, 
-  endDate, 
-  done, 
-  minify }: {
+const extractQueryStringParameters = (queryStringParameters: {
     startDate?: string,
     endDate?: string,
     done: string,
@@ -31,10 +35,15 @@ const extractQueryParameters = ({
     filters?: Partial<TodoFilters>,
     minify?: boolean
   } => {
-  const hasFilters = isZonedDateTime(startDate) && isZonedDateTime(endDate) && typeof done === 'string';  
+  const { startDate, endDate, done, minify } = queryStringParameters;
+
+  const startDateTime = parseDate(startDate) ?? Temporal.Now.zonedDateTimeISO().subtract({ months: 1 });
+  const endDateTime = parseDate(endDate) ?? Temporal.Now.zonedDateTimeISO().add({ months: 1 });
+
+  const hasFilters = startDateTime || endDateTime || typeof done === 'string';  
   const filters = hasFilters ? { 
-    startDate: Temporal.ZonedDateTime.from(startDate ?? Temporal.Now.zonedDateTimeISO().subtract({ months: 1 })), 
-    endDate: Temporal.ZonedDateTime.from(endDate ?? Temporal.Now.zonedDateTimeISO().add({ months: 1 })), 
+    startDate: startDateTime , 
+    endDate: endDateTime, 
     done: parseBoolean(done),
   } as Partial<TodoFilters> : undefined;
 
@@ -44,27 +53,9 @@ const extractQueryParameters = ({
   };
 }
 
-const sideEffects = (...funcs: Function[]) => {
-  for (const fn of funcs) {
-    fn();
-  }
-}
-
-export const handler = async (event: any, context: any) => {  
-  context.callbackWaitsForEmptyEventLoop = true;
+export const handler = handlerFactory(async (event: any) => { 
+  const { filters, minify } = extractQueryStringParameters({ ...event.queryStringParameters });
+  const todos = await getTodos(filters);
   
-  try {
-    sideEffects(
-      () => console.log(event),
-      async () => console.log('async')
-    );
-
-    const { filters, minify } = extractQueryParameters({ ...event.queryStringParameters });
-    const todos = await getTodos(filters);
-    
-    return response(200, todos, { minify });
-  } catch (e) {
-    console.error(e);
-    return response(500);
-  }
-}
+  return response(200, todos, { minify });
+});
