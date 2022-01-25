@@ -4,30 +4,41 @@ import { response } from "../../shared/response";
 
 import { TodoFilters } from "../../types/todo";
 
-const extractFilters = ({ startDate, endDate, status }: any) => {
-  if (!startDate && !endDate && !status) {
-    return undefined;
-  }
-  
+const isZonedDateTime = (obj: any) => obj instanceof Temporal.ZonedDateTime;
+
+const extractQueryParameters = ({ startDate = Temporal.Now.zonedDateTimeISO(), endDate = Temporal.Now.zonedDateTimeISO(), done, minify }: any) => {
+  const hasFilters = isZonedDateTime(startDate) && isZonedDateTime(endDate) && typeof done !== 'boolean';  
+  const filters = hasFilters ? { 
+    startDate: Temporal.ZonedDateTime.from(startDate), 
+    endDate: Temporal.ZonedDateTime.from(endDate), 
+    done: Boolean(done.toLowerCase() === 'true' || done.toLowerCase() === 'false'),
+  } as TodoFilters : undefined;
+
   return { 
-    startDate: Temporal.Instant.from(startDate), 
-    endDate: Temporal.Instant.from(endDate), 
-    done: ((status) => Boolean(status === 'true' || status === 'false'))(status.toLowerCase())
-  } as TodoFilters;
+    filters,
+    minify,
+  };
 }
 
-const sideEffects = async (event: any) => {
-  console.log(event);
-};
+const sideEffects = (...funcs: Function[]) => {
+  for (const fn of funcs) {
+    fn();
+  }
+}
 
-export const handler = async (event: any) => {  
+export const handler = async (event: any, context: any) => {  
+  context.callbackWaitsForEmptyEventLoop = true;
+  
   try {
-    sideEffects(event);
+    sideEffects(
+      () => console.log(event),
+      async () => console.log('async')
+    );
 
-    const filters = extractFilters({ ...event.queryStringParameters });
+    const { filters, minify } = extractQueryParameters({ ...event.queryStringParameters });
     const todos = await getTodos(filters);
     
-    return response(200, todos);
+    return response(200, todos, { minify });
   } catch (e) {
     console.error(e);
     return response(500);

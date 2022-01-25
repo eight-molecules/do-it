@@ -1,13 +1,21 @@
-const defaultResponses: { [key: number]: () => String } = {
-  200: () => 'Success',
-  400: () => 'Bad Request',
-  404: () => 'Not Found',
-  500: () => 'Internal Server Error'
+const defaultResponses: { [key: number]: () => { message: string } } = {
+  200: () => ({ message: 'Success' }),
+  400: () => ({ message: 'Bad Request' }),
+  404: () => ({ message: 'Not Found' }),
+  500: () => ({ message: 'Internal Server Error' }),
 };
 
-export const response = (statusCode: number, body?: any) => {
+interface ResponseOptions {
+  minify: boolean
+};
+
+export const response = (statusCode: number, body?: any, options?: ResponseOptions) => {
+  const useDefault = (typeof body === 'undefined' && typeof options === 'undefined');
+  let sanitizedBody = useDefault ? defaultResponses[statusCode]?.() ?? '' : body;
+  const stringifiedBody = options?.minify ? JSON.stringify(sanitizedBody, null, 2) : JSON.stringify(body);
+
   return {
     statusCode,
-    body: body ? JSON.stringify(body) : defaultResponses[statusCode]?.() ?? '',
+    body: stringifiedBody,
   };
 };
