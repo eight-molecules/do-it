@@ -54,6 +54,7 @@ export const getTodos = async (filters?: Partial<TodoFilters>): Promise<Todo[]> 
     }
   }
 
+  console.log(filters);
   resolve(result);
 }, 1000 * Math.random()));
 

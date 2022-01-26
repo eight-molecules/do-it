@@ -24,7 +24,7 @@ export const queryStringExtractorFactory = (mapFn: Function) => (event: any) => 
   return { 
     minify: parseBoolean(minify),
     ...mapFn(queryStringParameters)
-  } as ( { minify: boolean });
+  };
 };
 
 export const extractQueryStringParameters = (event: any) => {
