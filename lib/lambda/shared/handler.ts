@@ -13,8 +13,8 @@ export const handlerFactory = (handlerFn: Function) => async (event: any = { }, 
 };
 
 export const queryStringExtractorFactory = (mapFn: Function) => (event: any) => {
-  const { queryStringParameters = { } } = event;
-  const { minify } = queryStringParameters; 
+  const queryStringParameters = event.queryStringParameters ?? { };
+  const { minify } =  queryStringParameters;
 
   return { 
     minify: parseBoolean(minify),
