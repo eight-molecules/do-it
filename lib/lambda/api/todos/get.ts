@@ -8,12 +8,12 @@ import { TodoFilters } from "../../types/todo";
 
 import { getTodos } from "../../services/todo.service";
 
-const extractQueryStringParameters = queryStringExtractorFactory((queryStringParameters?: {
+const extractQueryStringParameters = queryStringExtractorFactory((queryStringParameters: {
   startDate?: string,
   endDate?: string,
   done?: string,
 }): { filters?: Partial<TodoFilters> } => {
-  const { startDate, endDate, done } = queryStringParameters ?? { };
+  const { startDate, endDate, done } = queryStringParameters;
 
   const startDateTime = parseTemporal(startDate) ?? Temporal.Now.zonedDateTimeISO().subtract({ months: 1 });
   const endDateTime = parseTemporal(endDate) ?? Temporal.Now.zonedDateTimeISO().add({ months: 1 });
@@ -34,7 +34,7 @@ interface GetTodosQueryParameters {
 };
 
 export const handler = handlerFactory(async (event: any) => { 
-  const { filters, minify } = extractQueryStringParameters({ ...event.queryStringParameters }) as GetTodosQueryParameters;
+  const { filters, minify } = extractQueryStringParameters(event) as GetTodosQueryParameters;
   const todos = await getTodos(filters);
   
   return response(200, todos, { minify });

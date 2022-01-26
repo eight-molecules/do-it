@@ -8,7 +8,6 @@ export const handler = handlerFactory(async (event: any) => {
   const { minify } = extractQueryStringParameters(event);
 
   if (!isULID(id)) {
-    console.log(id)
     return response(400);
   }
 

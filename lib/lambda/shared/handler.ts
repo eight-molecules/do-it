@@ -16,11 +16,6 @@ export const queryStringExtractorFactory = (mapFn: Function) => (event: any) => 
   const { queryStringParameters = { } } = event;
   const { minify } = queryStringParameters; 
 
-  if (typeof mapFn === 'object') {
-    return {
-      minify: parseBoolean(minify),
-    }
-  }
   return { 
     minify: parseBoolean(minify),
     ...mapFn(queryStringParameters)
