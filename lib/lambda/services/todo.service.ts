@@ -50,11 +50,11 @@ export const getTodos = async (filters?: Partial<TodoFilters>): Promise<Todo[]> 
       const matchEndDate = (todo: Todo) => !useStartDate || Temporal.ZonedDateTime.compare(todo.date, endDate!) < 1;
       const matchStatus = (todo: Todo) => !useDone || todo.done === done;
       
-      result = todos.filter((todo) => {
-        return matchStartDate(todo) && matchEndDate(todo) && matchStatus(todo);
-      });
+      result = todos.filter((todo) => matchStartDate(todo) && matchEndDate(todo) && matchStatus(todo));
     }
   }
 
   resolve(result);
 }, 1000 * Math.random()));
+
+export const getTodo = async (id: string) => new Promise<Todo | undefined>((resolve) => setTimeout(() => resolve(todos.find((todo) => todo.id === id)), 1000 * Math.random()));
