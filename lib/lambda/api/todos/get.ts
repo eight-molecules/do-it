@@ -13,7 +13,7 @@ const parseDate = (obj: any) => {
   }
 };
 
-const parseBoolean = (str: string) => {
+const parseBoolean = (str?: string) => {
   if (typeof str !== 'string') {
     return undefined;
   }
@@ -26,16 +26,16 @@ const parseBoolean = (str: string) => {
   return formattedString === 'true';
 };
 
-const extractQueryStringParameters = (queryStringParameters: {
+const extractQueryStringParameters = (queryStringParameters?: {
     startDate?: string,
     endDate?: string,
-    done: string,
-    minify: string
+    done?: string,
+    minify?: string
   }): {
     filters?: Partial<TodoFilters>,
     minify?: boolean
   } => {
-  const { startDate, endDate, done, minify } = queryStringParameters;
+  const { startDate, endDate, done, minify } = queryStringParameters ?? { };
 
   const startDateTime = parseDate(startDate) ?? Temporal.Now.zonedDateTimeISO().subtract({ months: 1 });
   const endDateTime = parseDate(endDate) ?? Temporal.Now.zonedDateTimeISO().add({ months: 1 });
@@ -47,6 +47,7 @@ const extractQueryStringParameters = (queryStringParameters: {
     done: parseBoolean(done),
   } as Partial<TodoFilters> : undefined;
 
+  console.log(filters, queryStringParameters)
   return { 
     filters,
     minify: parseBoolean(minify),

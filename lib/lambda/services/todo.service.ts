@@ -17,7 +17,7 @@ const todos: Todo[] = [
     title: 'Create Api',
     description: 'Create an api to serve this data.',
     date: Temporal.Now.instant().toZonedDateTimeISO('America/New_York'),
-    done: false,
+    done: true,
   },
   {
     id: ulid(),
@@ -37,20 +37,24 @@ const todos: Todo[] = [
 
 
 export const getTodos = async (filters?: Partial<TodoFilters>): Promise<Todo[]> => new Promise((resolve) => setTimeout(() => {
-  const { startDate, endDate, done } = filters ?? { };
-  const useStartDate = startDate instanceof Temporal.ZonedDateTime; 
-  const useEndDate = endDate instanceof Temporal.ZonedDateTime;
-  const useDone = typeof done === 'boolean';
+  let result: Todo[] = [ ...todos ];
+  
+  if (filters) {
+    const { startDate, endDate, done } = filters ?? { };
+    const useStartDate = startDate instanceof Temporal.ZonedDateTime; 
+    const useEndDate = endDate instanceof Temporal.ZonedDateTime;
+    const useDone = typeof done === 'boolean';
 
-  if (!useStartDate && !useEndDate && !useDone) {
-    resolve([ ...todos ]);
+    if (useStartDate || useEndDate || useDone) {
+      const matchStartDate = (todo: Todo) => !useStartDate || Temporal.ZonedDateTime.compare(todo.date, startDate!) > -1;
+      const matchEndDate = (todo: Todo) => !useStartDate || Temporal.ZonedDateTime.compare(todo.date, endDate!) < 1;
+      const matchStatus = (todo: Todo) => !useDone || todo.done === done;
+      
+      result = todos.filter((todo) => {
+        return matchStartDate(todo) && matchEndDate(todo) && matchStatus(todo);
+      });
+    }
   }
 
-  const matchStartDate = (todo: Todo) => useStartDate === false || Temporal.ZonedDateTime.compare(todo.date, startDate!) > -1;
-  const matchEndDate = (todo: Todo) => useStartDate === false || Temporal.ZonedDateTime.compare(todo.date, endDate!) < 1;
-  const matchStatus = (todo: Todo) => useDone === false|| todo.done === done;
-  
-  const filteredResult = todos.filter((todo) => matchStartDate(todo) && matchEndDate(todo) && matchStatus(todo));
-
-  resolve(filteredResult);
+  resolve(result);
 }, 1000 * Math.random()));
