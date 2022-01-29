@@ -4,7 +4,7 @@ import { handlerFactory, queryStringExtractorFactory } from '../../shared/handle
 import { parseBoolean, parseTemporal } from '../../shared/parse';
 import { response } from '../../shared/response';
 
-import { TodoFilters } from '../../types/todo';
+import { Filters } from '../../types/todo';
 
 import { getTodos } from '../../services/todo.service';
 
@@ -12,7 +12,7 @@ const extractQueryStringParameters = queryStringExtractorFactory((queryStringPar
   createdDate?: string,
   lastModifiedDate?: string,
   done?: string,
-}): { filters?: Partial<TodoFilters> } => {
+}): { filters?: Partial<Filters> } => {
   const { createdDate, lastModifiedDate, done } = queryStringParameters;
 
   const [ createdDateStartString, createdDateEndString ] = createdDate?.split(':') ?? [ undefined, undefined ];
@@ -31,20 +31,20 @@ const extractQueryStringParameters = queryStringExtractorFactory((queryStringPar
     lastModifiedDateStart,
     lastModifiedDateEnd,
     done: parseBoolean(done),
-  } as Partial<TodoFilters> : {
+  } as Partial<Filters> : {
     createdDateStart,
     createdDateEnd,
     lastModifiedDateStart: Temporal.Now.zonedDateTimeISO().subtract({ months: 1 }),
     lastModifiedDateEnd: Temporal.Now.zonedDateTimeISO(),
     done: parseBoolean(done)
-  } as Partial<TodoFilters>;
+  } as Partial<Filters>;
 
   return { filters };
 });
 
 
 interface GetTodosQueryParameters {
-  minify: boolean, filters?: Partial<TodoFilters> | Error
+  minify: boolean, filters?: Partial<Filters> | Error
 }
 
 export const handler = handlerFactory(async (event: any) => { 

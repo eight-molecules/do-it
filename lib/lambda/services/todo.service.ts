@@ -1,7 +1,10 @@
 import { decodeTime, encodeTime, ulid } from '../shared/ulid';
 
 import { Temporal } from '@js-temporal/polyfill';
-import { TodoFilters } from '../types/todo';
+import { Filters } from '../types/todo';
+
+import todos from './todo.data';
+import { convertTenBitTimestampToZonedDateTime } from '../shared/time';
 
 export interface Todo {
   id: string,
@@ -12,16 +15,22 @@ export interface Todo {
   done: boolean,
 }
 
-const toTodos = ({ id, title, description, done, lastModified }: any) => {
-  const createdDate = Temporal.Instant.fromEpochSeconds(decodeTime(id)).toZonedDateTimeISO('America/New_York');
-  const lastModifiedDate = Temporal.Instant.fromEpochSeconds(decodeTime(`${lastModified}0000000000000000`)).toZonedDateTimeISO('America/New_York')
+const toTodo = ({ id, title, description, done, lastModified }: {
+  id: string,
+  title: string,
+  description: string,
+  done: boolean,
+  lastModified: string
+}) => {
+  const createdDate = convertTenBitTimestampToZonedDateTime(id);
+  const lastModifiedDate = convertTenBitTimestampToZonedDateTime(lastModified)
 
   return { id, title, description, done, lastModifiedDate, createdDate };
 };
 
-const fetchTodos = async () => (await import('./todos')).default.map(toTodos);
+const fetchTodos = async () => todos.map(toTodo);
 
-export const getTodos = async (filters?: Partial<TodoFilters>): Promise<Todo[]> => new Promise((resolve) => setTimeout(async () => {
+export const getTodos = async (filters?: Partial<Filters>): Promise<Todo[]> => new Promise((resolve) => setTimeout(async () => {
   let result: Todo[] = await fetchTodos();
 
   if (filters) {
@@ -39,7 +48,13 @@ export const getTodos = async (filters?: Partial<TodoFilters>): Promise<Todo[]> 
       const matchLastModifiedDateEnd = (todo: Todo) => !useLastModifiedDateEnd || Temporal.ZonedDateTime.compare(todo.createdDate, lastModifiedDateEnd!) < 1;
       const matchStatus = (todo: Todo) => !useDone || todo.done === done;
       
-      result = result.filter((todo) => matchCreatedDateStart(todo) && matchCreatedDateEnd(todo) && matchLastModifiedDateStart(todo) && matchLastModifiedDateEnd(todo) && matchStatus(todo));
+      result = result.filter((todo) => (
+        matchCreatedDateStart(todo) && 
+        matchCreatedDateEnd(todo) && 
+        matchLastModifiedDateStart(todo) && 
+        matchLastModifiedDateEnd(todo) && 
+        matchStatus(todo)
+      ));
     }
   }
 
@@ -53,3 +68,23 @@ export const getTodo = (id: string) => new Promise<Todo | undefined>((resolve) =
     resolve(todos.find((todo) => todo.id === id));
   }, 1000 * Math.random()); 
 });
+
+export const createTodo = (title: string, props: Partial<Todo> = { }) => {
+  const { description = '', done = false } = props;
+
+  const now = Temporal.Now.instant().epochSeconds;
+  const id = ulid(now);
+  const lastModified = encodeTime(now);
+
+  const data = { 
+    id, 
+    title,
+    description,
+    done,
+    lastModified
+  };
+
+  todos.push(data);
+
+  return toTodo(data);
+}
