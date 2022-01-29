@@ -43,6 +43,15 @@ export class TodoAwsStack extends Stack {
       }
     });
 
+    const postTodoHandler = new lambda.NodejsFunction(this, 'PostTodoFunction', {
+      entry: path.join(__dirname, '/lambda/api/todos/post.ts'),
+      handler: 'handler',
+      bundling: {
+        sourceMap: true,
+        sourceMapMode: lambda.SourceMapMode.INLINE
+      }
+    });
+
     const getTodoHandler = new lambda.NodejsFunction(this, 'GetTodoFunction', {
       entry: path.join(__dirname, '/lambda/api/todos/{id}/get.ts'),
       handler: 'handler',
@@ -53,6 +62,10 @@ export class TodoAwsStack extends Stack {
     });
 
     this.api.root.getResource('todos')?.addMethod('GET', new apigateway.LambdaIntegration(getTodosHandler), {
+      authorizationType: apigateway.AuthorizationType.NONE
+    });
+
+    this.api.root.getResource('todos')?.addMethod('POST', new apigateway.LambdaIntegration(postTodoHandler), {
       authorizationType: apigateway.AuthorizationType.NONE
     });
 
