@@ -1,4 +1,4 @@
-import { Temporal } from "@js-temporal/polyfill";
+import { Temporal } from '@js-temporal/polyfill';
 
 export const parseBoolean = (str?: string) => {
   if (typeof str !== 'string') {
@@ -13,10 +13,4 @@ export const parseBoolean = (str?: string) => {
   return formattedString === 'true';
 };
 
-export const parseTemporal = (obj: any) => {
-  try { 
-    return Temporal.ZonedDateTime.from(obj);
-  } catch (error) {
-    return undefined;
-  }
-};
+export const parseTemporal = (obj?: string) => typeof obj === 'string' ? Temporal.ZonedDateTime.from(obj) : undefined;

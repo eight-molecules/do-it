@@ -7,7 +7,7 @@ const defaultResponses: { [key: number]: () => { message: string } } = {
 
 interface ResponseOptions {
   minify?: boolean
-};
+}
 
 export const response = (statusCode: number, body?: any, options?: ResponseOptions) => {
   const useDefault = (typeof body === 'undefined' && typeof options === 'undefined');

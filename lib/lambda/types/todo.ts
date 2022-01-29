@@ -4,4 +4,4 @@ export interface TodoFilters {
   startDate: Temporal.ZonedDateTime, 
   endDate: Temporal.ZonedDateTime, 
   done: boolean 
-};
+}

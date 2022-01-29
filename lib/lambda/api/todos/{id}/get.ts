@@ -1,7 +1,7 @@
-import { getTodo } from "../../../services/todo.service";
-import { extractQueryStringParameters, handlerFactory } from "../../../shared/handler";
-import { response } from "../../../shared/response";
-import { isULID } from "../../../shared/ulid";
+import { getTodo } from '../../../services/todo.service';
+import { extractQueryStringParameters, handlerFactory } from '../../../shared/handler';
+import { response } from '../../../shared/response';
+import { isULID } from '../../../shared/ulid';
 
 export const handler = handlerFactory(async (event: any) => { 
   const { id } = event.pathParameters;

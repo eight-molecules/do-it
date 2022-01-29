@@ -25,7 +25,14 @@ export class TodoAwsStack extends Stack {
         allowOrigins: [ 'https://*.prettycool.link' ],
         allowMethods: [ 'GET' ]
       }
-    })
+    });
+
+    this.api.root.getResource('todos')?.addResource('{id}', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: [ 'https://*.prettycool.link' ],
+        allowMethods: [ 'GET' ]
+      }
+    });
 
     const getTodosHandler = new lambda.NodejsFunction(this, 'GetTodosFunction', {
       entry: path.join(__dirname, '/lambda/api/todos/get.ts'),
@@ -36,7 +43,20 @@ export class TodoAwsStack extends Stack {
       }
     });
 
+    const getTodoHandler = new lambda.NodejsFunction(this, 'GetTodoFunction', {
+      entry: path.join(__dirname, '/lambda/api/todos/{id}/get.ts'),
+      handler: 'handler',
+      bundling: {
+        sourceMap: true,
+        sourceMapMode: lambda.SourceMapMode.INLINE
+      }
+    });
+
     this.api.root.getResource('todos')?.addMethod('GET', new apigateway.LambdaIntegration(getTodosHandler), {
+      authorizationType: apigateway.AuthorizationType.NONE
+    });
+
+    this.api.root.getResource('todos/{id}')?.addMethod('GET', new apigateway.LambdaIntegration(getTodoHandler), {
       authorizationType: apigateway.AuthorizationType.NONE
     });
 

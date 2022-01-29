@@ -1,5 +1,5 @@
-import { parseBoolean } from "./parse";
-import { response } from "./response";
+import { parseBoolean } from './parse';
+import { response } from './response';
 
 export const handlerFactory = (handlerFn: Function) => async (event: any = { }, context: any = { }, callback: Function = async () => { }) => {  
   context.callbackWaitsForEmptyEventLoop = true;

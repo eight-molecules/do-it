@@ -9,39 +9,19 @@ export interface Todo {
   description: string,
   date: Temporal.ZonedDateTime,
   done: boolean,
-};
+}
 
-const _todos: any[] = [
-  {
-    id: ulid(Temporal.Now.instant().toZonedDateTimeISO('America/New_York').epochSeconds),
-    title: 'Create Api',
-    description: 'Create an api to serve this data.',
-    date: Temporal.Now.instant().toZonedDateTimeISO('America/New_York'),
-    done: true,
-  },
-  {
-    id: ulid(Temporal.Now.instant().toZonedDateTimeISO('America/New_York').add({ days: 1 }).epochSeconds),
-    title: 'Update a done status',
-    description: 'Create a way to persist updates to complete the Create Api item.',
-    done: false,
-  },
-  {
-    id: ulid(Temporal.Now.instant().toZonedDateTimeISO('America/New_York').subtract({ days: 1 }).epochSeconds),
-    title: 'Create App',
-    description: 'Create a react app to display this data',
-    done: false,
-  }
-]
-
-const fetchTodos = async () => _todos.map(({ id, title, description, done }) => ({ 
+const toTodos = ({ id, title, description, done }: any) => ({ 
   id, title, description, done,
   date: Temporal.Instant.fromEpochSeconds(decodeTime(id)).toZonedDateTimeISO('America/New_York'),
-}));
+});
+
+const fetchTodos = async () => (await import('./todos')).default.map(toTodos);
 
 
 export const getTodos = async (filters?: Partial<TodoFilters>): Promise<Todo[]> => new Promise((resolve) => setTimeout(async () => {
   let result: Todo[] = await fetchTodos();
-  
+
   if (filters) {
     const { startDate, endDate, done } = filters ?? { };
     const useStartDate = startDate instanceof Temporal.ZonedDateTime; 
@@ -63,6 +43,7 @@ export const getTodos = async (filters?: Partial<TodoFilters>): Promise<Todo[]> 
 export const getTodo = (id: string) => new Promise<Todo | undefined>((resolve) => {
   setTimeout(async () => {
     const todos = (await fetchTodos());
-    resolve(todos.find((todo) => todo.id === id))
-  }, 1000 * Math.random())
+
+    resolve(todos.find((todo) => todo.id === id));
+  }, 1000 * Math.random()); 
 });

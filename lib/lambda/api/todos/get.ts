@@ -1,12 +1,12 @@
-import { Temporal } from "@js-temporal/polyfill";
+import { Temporal } from '@js-temporal/polyfill';
 
-import { handlerFactory, queryStringExtractorFactory } from "../../shared/handler";
-import { parseBoolean, parseTemporal } from "../../shared/parse";
-import { response } from "../../shared/response";
+import { handlerFactory, queryStringExtractorFactory } from '../../shared/handler';
+import { parseBoolean, parseTemporal } from '../../shared/parse';
+import { response } from '../../shared/response';
 
-import { TodoFilters } from "../../types/todo";
+import { TodoFilters } from '../../types/todo';
 
-import { getTodos } from "../../services/todo.service";
+import { getTodos } from '../../services/todo.service';
 
 const extractQueryStringParameters = queryStringExtractorFactory((queryStringParameters: {
   startDate?: string,
@@ -31,7 +31,7 @@ const extractQueryStringParameters = queryStringExtractorFactory((queryStringPar
 
 interface GetTodosQueryParameters {
   minify: boolean, filters?: Partial<TodoFilters>
-};
+}
 
 export const handler = handlerFactory(async (event: any) => { 
   const { filters, minify } = extractQueryStringParameters(event) as GetTodosQueryParameters;
