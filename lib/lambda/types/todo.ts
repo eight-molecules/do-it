@@ -1,7 +1,9 @@
 import { Temporal } from '@js-temporal/polyfill';
 
-export interface TodoFilters { 
-  startDate: Temporal.ZonedDateTime, 
-  endDate: Temporal.ZonedDateTime, 
+export interface TodoFilters {
+  createdDateStart: Temporal.ZonedDateTime,
+  createdDateEnd: Temporal.ZonedDateTime,
+  lastModifiedDateStart: Temporal.ZonedDateTime, 
+  lastModifiedDateEnd: Temporal.ZonedDateTime, 
   done: boolean 
 }

@@ -9,32 +9,51 @@ import { TodoFilters } from '../../types/todo';
 import { getTodos } from '../../services/todo.service';
 
 const extractQueryStringParameters = queryStringExtractorFactory((queryStringParameters: {
-  startDate?: string,
-  endDate?: string,
+  createdDate?: string,
+  lastModifiedDate?: string,
   done?: string,
 }): { filters?: Partial<TodoFilters> } => {
-  const { startDate, endDate, done } = queryStringParameters;
+  const { createdDate, lastModifiedDate, done } = queryStringParameters;
 
-  const startDateTime = parseTemporal(startDate) ?? Temporal.Now.zonedDateTimeISO().subtract({ months: 1 });
-  const endDateTime = parseTemporal(endDate) ?? Temporal.Now.zonedDateTimeISO().add({ months: 1 });
+  const [ createdDateStartString, createdDateEndString ] = createdDate?.split(':') ?? [ undefined, undefined ];
+  const [ lastModifiedDateStartString, lastModifiedDateEndString ] = lastModifiedDate?.split(':') ?? [ undefined, undefined ];
 
-  const hasFilters = startDateTime || endDateTime || typeof done === 'string';  
+  const createdDateStart = parseTemporal(createdDateStartString);
+  const createdDateEnd = parseTemporal(createdDateEndString);
+
+  const lastModifiedDateStart = parseTemporal(lastModifiedDateStartString);
+  const lastModifiedDateEnd = parseTemporal(lastModifiedDateEndString);
+
+  const hasFilters = createdDateStart || createdDateEnd || lastModifiedDateStart || lastModifiedDateEnd || typeof done === 'string';  
   const filters = hasFilters ? { 
-    startDate: startDateTime , 
-    endDate: endDateTime, 
+    createdDateStart,
+    createdDateEnd,
+    lastModifiedDateStart,
+    lastModifiedDateEnd,
     done: parseBoolean(done),
-  } as Partial<TodoFilters> : undefined;
+  } as Partial<TodoFilters> : {
+    createdDateStart,
+    createdDateEnd,
+    lastModifiedDateStart: Temporal.Now.zonedDateTimeISO().subtract({ months: 1 }),
+    lastModifiedDateEnd: Temporal.Now.zonedDateTimeISO(),
+    done: parseBoolean(done)
+  } as Partial<TodoFilters>;
 
   return { filters };
 });
 
 
 interface GetTodosQueryParameters {
-  minify: boolean, filters?: Partial<TodoFilters>
+  minify: boolean, filters?: Partial<TodoFilters> | Error
 }
 
 export const handler = handlerFactory(async (event: any) => { 
   const { filters, minify } = extractQueryStringParameters(event) as GetTodosQueryParameters;
+
+  if (filters instanceof Error) {
+    return response(400, undefined, { minify });
+  }
+
   const todos = await getTodos(filters);
   
   return response(200, todos, { minify });
