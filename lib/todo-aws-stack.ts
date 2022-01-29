@@ -56,7 +56,7 @@ export class TodoAwsStack extends Stack {
       authorizationType: apigateway.AuthorizationType.NONE
     });
 
-    this.api.root.getResource('todos/{id}')?.addMethod('GET', new apigateway.LambdaIntegration(getTodoHandler), {
+    this.api.root.getResource('todos')?.getResource('{id}')?.addMethod('GET', new apigateway.LambdaIntegration(getTodoHandler), {
       authorizationType: apigateway.AuthorizationType.NONE
     });
 

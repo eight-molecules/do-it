@@ -23,13 +23,13 @@ export const queryStringExtractorFactory = (mapFn: Function) => (event: any) => 
 };
 
 export const extractQueryStringParameters = (event: any) => {
-  if ((typeof event !== 'object' || !event.hasOwnProperty('queryStringParameters'))) {
+  if (typeof event !== 'object' || !('queryStringParameters' in event)) {
     return {
       minify: false
     };
   }
 
-  const { minify = 'false' } = event.queryStringParameters;
+  const { minify = 'false' } = event.queryStringParameters ?? { };
 
   return {
     minify: parseBoolean(minify) ?? false,
