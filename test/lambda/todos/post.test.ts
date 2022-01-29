@@ -7,9 +7,9 @@ import { isULID } from "../../../lib/lambda/shared/ulid";
 describe('POST /todos', () => {
   it('should return a 200 when given a title', async () => {
     const event = {
-      body: {
+      body: JSON.stringify({
         title: 'Test Todo'
-      }
+      })
     };
 
     const res = await handler(event);

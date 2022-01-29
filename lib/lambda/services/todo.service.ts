@@ -69,7 +69,7 @@ export const getTodo = (id: string) => new Promise<Todo | undefined>((resolve) =
   }, 1000 * Math.random()); 
 });
 
-export const createTodo = (title: string, props: Partial<Todo> = { }) => {
+export const createTodo = async (title: string, props: Partial<Todo> = { }) => {
   const { description = '', done = false } = props;
 
   const now = Temporal.Now.instant().epochSeconds;
@@ -85,6 +85,5 @@ export const createTodo = (title: string, props: Partial<Todo> = { }) => {
   };
 
   todos.push(data);
-
   return toTodo(data);
 }
