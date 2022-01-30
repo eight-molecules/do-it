@@ -30,4 +30,22 @@ describe('POST /todos', () => {
 
     expect(Temporal.ZonedDateTime.compare(lastModifiedDate, createdDate)).toBe(0);
   });
+
+  it('should return a 400 when the title is not a string', async () => {
+    const event = {
+      body: JSON.stringify({
+        title: 1
+      }),
+      queryStringParameters: {
+        minify: 'true'
+      }
+    };
+
+    const res = await handler(event);
+    
+    expect(typeof res).toBe('object');
+    expect(res.statusCode).toBe(400);
+
+    expect(res.body).toBe(JSON.stringify({ message: 'Bad Request' }));
+  });
 });

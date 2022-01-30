@@ -15,15 +15,16 @@ export interface Todo {
   done: boolean,
 }
 
-const toTodo = ({ id, title, description, done, lastModified }: {
-  id: string,
+const toTodo = ({ pk, sk, title, description, done }: {
+  pk: string,
+  sk: string,
   title: string,
   description: string,
   done: boolean,
-  lastModified: string
 }) => {
-  const createdDate = convertTenBitTimestampToZonedDateTime(id);
-  const lastModifiedDate = convertTenBitTimestampToZonedDateTime(lastModified)
+  const id = pk;
+  const createdDate = convertTenBitTimestampToZonedDateTime(pk);
+  const lastModifiedDate = convertTenBitTimestampToZonedDateTime(sk)
 
   return { id, title, description, done, lastModifiedDate, createdDate };
 };
@@ -73,15 +74,15 @@ export const createTodo = async (title: string, props: Partial<Todo> = { }) => {
   const { description = '', done = false } = props;
 
   const now = Temporal.Now.instant().epochSeconds;
-  const id = ulid(now);
-  const lastModified = encodeTime(now);
+  const pk = ulid(now);
+  const sk = encodeTime(now);
 
-  const data = { 
-    id, 
+  const data = {
+    pk,
+    sk, 
     title,
     description,
     done,
-    lastModified
   };
 
   todos.push(data);
