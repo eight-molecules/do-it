@@ -14,7 +14,6 @@ export const response = (statusCode: number, body?: any, options?: ResponseOptio
   const responseBody = typeof body === 'undefined' ?  defaultBody(statusCode) : body;
   const responseBodyValue = options?.minify ? JSON.stringify(responseBody) : JSON.stringify(responseBody, null, 2);
 
-  console.log(responseBodyValue)
   return {
     statusCode,
     body: responseBodyValue,
